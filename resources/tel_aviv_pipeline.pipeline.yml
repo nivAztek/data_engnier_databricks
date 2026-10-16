@@ -1,0 +1,31 @@
+resources:
+  pipelines:
+    tel_aviv_compensation:
+      name: 'tel_aviv_compensation_pipeline'
+
+      catalog: ${var.catalog}
+      target: ${resources.schemas.tel_aviv_schema.name}
+
+      libraries:
+        - glob:
+            include: ../src/bronze/**
+        - glob:
+            include: ../src/silver/**
+        - glob:
+            include: ../src/gold/**
+
+      root_path: ../src
+
+      serverless: true
+      continuous: false
+      photon: true
+      channel: current
+
+      configuration:
+        pipeline.year_start: '2023-01-01'
+        pipeline.year_end: '2023-12-31'
+        pipeline.volume_path: '/Volumes/${var.catalog}/${resources.schemas.tel_aviv_schema.name}/${resources.volumes.raw_data.name}'
+
+      permissions:
+        - level: CAN_VIEW
+          group_name: 'users'

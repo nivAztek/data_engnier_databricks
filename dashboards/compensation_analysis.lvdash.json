@@ -1,0 +1,995 @@
+{
+  "datasets": [
+    {
+      "name": "monthly_trend",
+      "displayName": "Monthly Compensation Trend",
+      "queryLines": [
+        "SELECT\n",
+        "  month,\n",
+        "  total_compensation_ils,\n",
+        "  num_businesses_affected,\n",
+        "  num_closure_days\n",
+        "FROM\n",
+        "  gold_monthly_compensation_trend\n",
+        "ORDER BY\n",
+        "  month "
+      ]
+    },
+    {
+      "name": "top_streets",
+      "displayName": "Top 15 Streets by Compensation",
+      "queryLines": [
+        "SELECT\n",
+        "  shem_rechov,\n",
+        "  total_street_compensation_ils,\n",
+        "  num_businesses_affected\n",
+        "FROM\n",
+        "  gold_compensation_per_street\n",
+        "ORDER BY\n",
+        "  total_street_compensation_ils DESC\n",
+        "LIMIT 15"
+      ]
+    },
+    {
+      "name": "biz_type",
+      "displayName": "Compensation by Business Type",
+      "queryLines": [
+        "SELECT\n",
+        "  shimush,\n",
+        "  total_compensation_ils,\n",
+        "  num_businesses,\n",
+        "  avg_compensation_ils\n",
+        "FROM\n",
+        "  gold_compensation_by_business_type\n",
+        "ORDER BY\n",
+        "  total_compensation_ils DESC\n",
+        "LIMIT 10"
+      ]
+    },
+    {
+      "name": "cost_per_area",
+      "displayName": "Cost Per Area Distribution",
+      "queryLines": [
+        "SELECT\n",
+        "  id_esek,\n",
+        "  shimush,\n",
+        "  shem_rechov,\n",
+        "  shetach,\n",
+        "  total_compensation_ils,\n",
+        "  cost_per_area,\n",
+        "  daily_rate_applied\n",
+        "FROM\n",
+        "  gold_cost_per_area\n",
+        "ORDER BY\n",
+        "  cost_per_area DESC\n",
+        "LIMIT 100"
+      ]
+    },
+    {
+      "name": "closure_duration",
+      "displayName": "Closure Duration by Street",
+      "queryLines": [
+        "SELECT\n",
+        "  affected_street,\n",
+        "  total_closure_days,\n",
+        "  num_closure_events,\n",
+        "  avg_closure_duration_days\n",
+        "FROM\n",
+        "  gold_closure_duration_by_street\n",
+        "ORDER BY\n",
+        "  total_closure_days DESC\n",
+        "LIMIT 15"
+      ]
+    },
+    {
+      "name": "street_detail",
+      "displayName": "Street Compensation Detail",
+      "queryLines": [
+        "SELECT\n",
+        "  shem_rechov,\n",
+        "  total_street_compensation_ils,\n",
+        "  num_businesses_affected,\n",
+        "  avg_compensation_per_business_ils,\n",
+        "  max_closure_days,\n",
+        "  total_business_closure_days\n",
+        "FROM\n",
+        "  gold_compensation_per_street\n",
+        "ORDER BY\n",
+        "  total_street_compensation_ils DESC"
+      ]
+    },
+    {
+      "name": "kpi_summary",
+      "displayName": "KPI Summary",
+      "queryLines": [
+        "SELECT\n",
+        "  SUM(total_compensation_ils) AS total_compensation,\n",
+        "  COUNT(*) AS total_businesses,\n",
+        "  AVG(total_compensation_ils) AS avg_compensation,\n",
+        "  COUNT(DISTINCT shem_rechov) AS total_streets\n",
+        "FROM\n",
+        "  gold_compensation_per_business"
+      ]
+    },
+    {
+      "name": "scatter_area",
+      "displayName": "Business Area vs Compensation",
+      "queryLines": [
+        "SELECT\n",
+        "  shetach,\n",
+        "  total_compensation_ils,\n",
+        "  shimush,\n",
+        "  shem_rechov\n",
+        "FROM\n",
+        "  gold_cost_per_area\n",
+        "WHERE\n",
+        "  shetach > 0\n",
+        "ORDER BY\n",
+        "  total_compensation_ils DESC\n",
+        "LIMIT 500"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "5e354f04",
+      "displayName": "Compensation Overview",
+      "layout": [
+        {
+          "widget": {
+            "name": "header_p1",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## 📊 Compensation Overview — Tel Aviv 2023\n",
+                "Key metrics and trends from the street closure compensation analysis. Covers **11,813 businesses** across **87 streets** with closures during fiscal year 2023."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_total_comp",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "kpi_summary",
+                  "fields": [
+                    {
+                      "name": "total_compensation",
+                      "expression": "`total_compensation`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Total Compensation (ILS)",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "total_compensation",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_businesses",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "kpi_summary",
+                  "fields": [
+                    {
+                      "name": "total_businesses",
+                      "expression": "`total_businesses`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Total Affected Businesses",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "total_businesses",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 2,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_streets",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "kpi_summary",
+                  "fields": [
+                    {
+                      "name": "total_streets",
+                      "expression": "`total_streets`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Total Affected Streets",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "total_streets",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 2,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_avg_comp",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "kpi_summary",
+                  "fields": [
+                    {
+                      "name": "avg_compensation",
+                      "expression": "`avg_compensation`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Avg Compensation Per Business (ILS)",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg_compensation",
+                  "rowNumber": 0
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 2,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "monthly_trend",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "monthly_trend",
+                  "fields": [
+                    {
+                      "name": "month",
+                      "expression": "`month`"
+                    },
+                    {
+                      "name": "sum(total_compensation_ils)",
+                      "expression": "SUM(`total_compensation_ils`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Monthly Compensation Trend (2023)",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "month",
+                  "displayName": "Month",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(total_compensation_ils)",
+                  "displayName": "Compensation (ILS)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 12,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "top_streets",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "top_streets",
+                  "fields": [
+                    {
+                      "name": "sum(total_street_compensation_ils)",
+                      "expression": "SUM(`total_street_compensation_ils`)"
+                    },
+                    {
+                      "name": "shem_rechov",
+                      "expression": "`shem_rechov`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Top 15 Streets by Compensation (ILS)",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(total_street_compensation_ils)",
+                  "displayName": "Compensation (ILS)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "shem_rechov",
+                  "displayName": "Street",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "biz_type",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "biz_type",
+                  "fields": [
+                    {
+                      "name": "shimush",
+                      "expression": "`shimush`"
+                    },
+                    {
+                      "name": "sum(total_compensation_ils)",
+                      "expression": "SUM(`total_compensation_ils`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Compensation by Business Type (Top 10)",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(total_compensation_ils)",
+                  "displayName": "Compensation (ILS)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "shimush",
+                  "displayName": "Business Type",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "color": {
+                  "fieldName": "shimush",
+                  "displayName": "shimush",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 9,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "biz_type_pie",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "biz_type",
+                  "fields": [
+                    {
+                      "name": "sum(total_compensation_ils)",
+                      "expression": "SUM(`total_compensation_ils`)"
+                    },
+                    {
+                      "name": "shimush",
+                      "expression": "`shimush`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Compensation Share by Business Type"
+              },
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "sum(total_compensation_ils)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "total_compensation_ils"
+                },
+                "color": {
+                  "fieldName": "shimush",
+                  "displayName": "shimush",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 16,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "pipeline_stats",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## ⚙️ Pipeline & Data Quality\n",
+                "\n",
+                "| Metric | Value |\n",
+                "|---|---|\n",
+                "| **Bronze Closures** | 2,006 rows ingested |\n",
+                "| **Bronze Businesses** | 37,345 rows (15 dropped by DQ) |\n",
+                "| **Silver Closures** | 4,012 rows (exploded both streets) |\n",
+                "| **Gold Fact Table** | 1,376,228 daily compensation records |\n",
+                "| **Eligible Businesses** | 11,813 on affected streets |\n",
+                "| **Affected Streets** | 87 with active closures |\n",
+                "| **DQ Drop Rate** | 0.04% (15/37,360) |\n",
+                "\n",
+                "**Architecture**: Medallion (Bronze→Silver→Gold) with Auto Loader + CDC\n",
+                "**Compute**: 100% serverless — sub-4-minute end-to-end runs\n",
+                "**Schedule**: Daily at 06:00 AM Jerusalem time"
+              ]
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 16,
+            "width": 6,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "detailed_analysis",
+      "displayName": "Detailed Analysis",
+      "layout": [
+        {
+          "widget": {
+            "name": "header_p2",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## 🔍 Detailed Analysis — Tel Aviv 2023\n",
+                "Cost-per-area distribution, business area vs compensation scatter analysis, closure durations, and full street-level breakdowns."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "cost_per_area_table",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "cost_per_area",
+                  "fields": [
+                    {
+                      "name": "id_esek",
+                      "expression": "`id_esek`"
+                    },
+                    {
+                      "name": "shimush",
+                      "expression": "`shimush`"
+                    },
+                    {
+                      "name": "shem_rechov",
+                      "expression": "`shem_rechov`"
+                    },
+                    {
+                      "name": "shetach",
+                      "expression": "`shetach`"
+                    },
+                    {
+                      "name": "total_compensation_ils",
+                      "expression": "`total_compensation_ils`"
+                    },
+                    {
+                      "name": "cost_per_area",
+                      "expression": "`cost_per_area`"
+                    },
+                    {
+                      "name": "daily_rate_applied",
+                      "expression": "`daily_rate_applied`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Cost Per Area Distribution (Top 100)"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "id_esek"
+                  },
+                  {
+                    "fieldName": "shimush"
+                  },
+                  {
+                    "fieldName": "shem_rechov"
+                  },
+                  {
+                    "fieldName": "shetach"
+                  },
+                  {
+                    "fieldName": "total_compensation_ils"
+                  },
+                  {
+                    "fieldName": "cost_per_area"
+                  },
+                  {
+                    "fieldName": "daily_rate_applied"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 12,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "closure_duration_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "closure_duration",
+                  "fields": [
+                    {
+                      "name": "sum(total_closure_days)",
+                      "expression": "SUM(`total_closure_days`)"
+                    },
+                    {
+                      "name": "affected_street",
+                      "expression": "`affected_street`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Closure Duration by Street (Top 15)",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(total_closure_days)",
+                  "displayName": "Total Closure Days",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "affected_street",
+                  "displayName": "Street",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 16,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "street_detail_table",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "street_detail",
+                  "fields": [
+                    {
+                      "name": "shem_rechov",
+                      "expression": "`shem_rechov`"
+                    },
+                    {
+                      "name": "total_street_compensation_ils",
+                      "expression": "`total_street_compensation_ils`"
+                    },
+                    {
+                      "name": "num_businesses_affected",
+                      "expression": "`num_businesses_affected`"
+                    },
+                    {
+                      "name": "avg_compensation_per_business_ils",
+                      "expression": "`avg_compensation_per_business_ils`"
+                    },
+                    {
+                      "name": "max_closure_days",
+                      "expression": "`max_closure_days`"
+                    },
+                    {
+                      "name": "total_business_closure_days",
+                      "expression": "`total_business_closure_days`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Street-Level Compensation Detail"
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "shem_rechov"
+                  },
+                  {
+                    "fieldName": "total_street_compensation_ils"
+                  },
+                  {
+                    "fieldName": "num_businesses_affected"
+                  },
+                  {
+                    "fieldName": "avg_compensation_per_business_ils"
+                  },
+                  {
+                    "fieldName": "max_closure_days"
+                  },
+                  {
+                    "fieldName": "total_business_closure_days"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 16,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "scatter_area_comp",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "scatter_area",
+                  "fields": [
+                    {
+                      "name": "shimush",
+                      "expression": "`shimush`"
+                    },
+                    {
+                      "name": "shetach",
+                      "expression": "`shetach`"
+                    },
+                    {
+                      "name": "total_compensation_ils",
+                      "expression": "`total_compensation_ils`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Business Area vs Total Compensation"
+              },
+              "version": 3,
+              "widgetType": "scatter",
+              "encodings": {
+                "x": {
+                  "fieldName": "shetach",
+                  "displayName": "Business Area (m²)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "total_compensation_ils",
+                  "displayName": "Total Compensation (ILS)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "shimush",
+                  "displayName": "Business Type",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 12,
+            "height": 7
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "canvasBackgroundColor": {
+        "light": "#EBEBEB",
+        "dark": "#0D1117"
+      },
+      "widgetBackgroundColor": {
+        "light": "#FCFCFD",
+        "dark": "#161B22"
+      },
+      "widgetBorderColor": {
+        "light": "#FCFCFD",
+        "dark": "#161B22"
+      },
+      "fontColor": {
+        "light": "#374151",
+        "dark": "#E4E9EE"
+      },
+      "selectionColor": {
+        "light": "#0D9488",
+        "dark": "#2DD4BF"
+      },
+      "visualizationColors": [
+        "#0D9488",
+        "#2563EB",
+        "#7C3AED",
+        "#DB2777",
+        "#EA580C",
+        "#CA8A04",
+        "#059669",
+        "#6366F1"
+      ],
+      "widgetHeaderAlignment": "LEFT",
+      "widgetPadding": 12,
+      "widgetMargin": 8,
+      "widgetCornerRadius": 8,
+      "widgetShadow": 10,
+      "fontSettings": {
+        "base": {
+          "fontFamily": "DM Sans",
+          "fontColor": {
+            "light": "#1A2332",
+            "dark": "#E6EDF3"
+          }
+        },
+        "widgetTitle": {
+          "fontFamily": "DM Sans",
+          "fontWeight": 600
+        },
+        "fieldTitle": {
+          "fontFamily": "DM Sans"
+        },
+        "fieldValue": {
+          "fontFamily": "DM Sans"
+        }
+      }
+    },
+    "applyModeEnabled": false
+  }
+}

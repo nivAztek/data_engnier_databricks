@@ -1,0 +1,41 @@
+resources:
+  jobs:
+    tel_aviv_compensation_job:
+      name: 'tel_aviv_compensation_job'
+
+      tasks:
+        - task_key: 'ingest_sources'
+          notebook_task:
+            notebook_path: ../src/ingest/download_sources.ipynb
+            source: WORKSPACE
+            base_parameters:
+              volume_path: '/Volumes/${var.catalog}/${resources.schemas.tel_aviv_schema.name}/${resources.volumes.raw_data.name}'
+              csv_url: 'https://storage.googleapis.com/test_onedatai/rechov_sagur.csv'
+              api_base_url: 'https://gisn.tel-aviv.gov.il/arcgis/rest/services/IView2/MapServer/925/query'
+              batch_size: '2000'
+          environment_key: 'ingest_env'
+
+        - task_key: 'refresh_pipeline'
+          depends_on:
+            - task_key: 'ingest_sources'
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.tel_aviv_compensation.id}
+            full_refresh: false
+          timeout_seconds: 3600
+
+      environments:
+        - environment_key: 'ingest_env'
+          spec:
+            client: '1'
+
+      schedule:
+        quartz_cron_expression: '0 0 6 * * ?'
+        timezone_id: 'Asia/Jerusalem'
+
+      max_concurrent_runs: 1
+      queue:
+        enabled: true
+
+      permissions:
+        - level: CAN_VIEW
+          group_name: 'users'

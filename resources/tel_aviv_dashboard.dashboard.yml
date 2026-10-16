@@ -1,0 +1,12 @@
+resources:
+  dashboards:
+    tel_aviv_compensation_dashboard:
+      display_name: 'Tel Aviv 2023 — Street Closure Compensation Analysis [${bundle.target}]'
+      file_path: ../dashboards/compensation_analysis.lvdash.json
+      warehouse_id: ${var.warehouse_id}
+      dataset_catalog: ${var.catalog}
+      dataset_schema: ${resources.schemas.tel_aviv_schema.name}
+
+      permissions:
+        - level: CAN_READ
+          group_name: 'users'

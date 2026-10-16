@@ -1,0 +1,41 @@
+bundle:
+  name: tel_aviv_compensation
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    default: 'main'
+  schema:
+    default: 'tel_aviv'
+  warehouse_id:
+    description: 'SQL warehouse ID for the dashboard'
+    default: '22370641fe39f9bc'
+
+resources:
+  schemas:
+    tel_aviv_schema:
+      catalog_name: ${var.catalog}
+      name: ${var.schema}
+
+  volumes:
+    raw_data:
+      catalog_name: ${var.catalog}
+      schema_name: ${resources.schemas.tel_aviv_schema.name}
+      name: 'raw_data'
+      volume_type: 'MANAGED'
+
+targets:
+  dev:
+    default: true
+    mode: development
+    variables:
+      catalog: 'main'
+      schema: 'tel_aviv'
+
+  prod:
+    mode: production
+    variables:
+      catalog: 'main'
+      schema: 'tel_aviv_prod'
